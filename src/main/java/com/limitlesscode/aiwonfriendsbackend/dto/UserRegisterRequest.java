@@ -1,11 +1,13 @@
 package com.limitlesscode.aiwonfriendsbackend.dto;
 
 
+import com.limitlesscode.aiwonfriendsbackend.annotation.FileSize;
+import com.limitlesscode.aiwonfriendsbackend.annotation.Image;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import org.hibernate.validator.constraints.URL;
+import org.springframework.web.multipart.MultipartFile;
 
 //email, password, name, photo, terms_agree
 public record UserRegisterRequest(
@@ -22,8 +24,9 @@ public record UserRegisterRequest(
         @Size(min = 2, max = 20, message = "이름은 2글자 이상, 20자 이하여야 합니다")
         String name,
 
-        @URL(protocol = "https", message = "사진의 url이 잘못된 형식입니다")
-        String photo,
+        @Image()
+        @FileSize()
+        MultipartFile photo,
 
         @NotNull(message = "반드시 약관에 동의해야 합니다")
         boolean terms_agree

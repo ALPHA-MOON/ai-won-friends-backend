@@ -6,6 +6,7 @@ import com.limitlesscode.aiwonfriendsbackend.entity.User;
 import com.limitlesscode.aiwonfriendsbackend.service.UserService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,8 +18,8 @@ public class UserController {
     private final UserService userService;
 
     //유저등록
-    @PostMapping()
-    public ResponseEntity<?> register(@Valid @RequestBody UserRegisterRequest request) {
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE) //어떤 미디어 타입을 받을 것인지 명시
+    public ResponseEntity<?> register(@Valid @ModelAttribute UserRegisterRequest request) {
         User user = userService.register(request);
         return ResponseEntity.status(201).body(UserRegisterResponse.toResponse(user));
     }

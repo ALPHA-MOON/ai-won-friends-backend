@@ -19,12 +19,16 @@ public class UserService {
 
     public User register(UserRegisterRequest request) {
 
+        //TODO: 사진을 파일시스템에 저장하고 db에 url로 저장하는 로직 추가 필요
+        String photoUrl = "https://example.com/photo/" + request.photo().getOriginalFilename();
+
+
         User user = new User(
             UUID.randomUUID(),
             passwordEncoder.encode(request.password()),
             request.email(),
             request.name(),
-            request.photo(),
+            photoUrl,
             LocalDateTime.now(),
             LocalDateTime.now(),
             null,
