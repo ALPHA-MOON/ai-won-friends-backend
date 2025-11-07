@@ -4,14 +4,14 @@ import com.limitlesscode.aiwonfriendsbackend.entity.User;
 
 import java.util.UUID;
 
-public record UserRegisterResponse(
+public record UserInfoResponse(
         UUID user_id,
         String email,
         String name,
         String photo
 ) {
-    public static UserRegisterResponse toResponse(User user) {
-        return new UserRegisterResponse(
+    public static UserInfoResponse toResponse(User user) {
+        return new UserInfoResponse(
                 user.getUser_id(),
                 user.getEmail(),
                 user.getName(),

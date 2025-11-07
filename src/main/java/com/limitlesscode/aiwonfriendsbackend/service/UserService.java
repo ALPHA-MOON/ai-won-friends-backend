@@ -39,4 +39,9 @@ public class UserService {
 
         return userRepository.save(user);
     }
+
+    public User getUser(String id) {
+        UUID user_id = UUID.fromString(id); //IllegalArgumentException
+        return userRepository.findById(user_id).orElseThrow();  //NoSuchElementException
+    }
 }

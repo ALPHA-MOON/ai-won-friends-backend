@@ -1,7 +1,7 @@
 package com.limitlesscode.aiwonfriendsbackend.controller;
 
 import com.limitlesscode.aiwonfriendsbackend.dto.UserRegisterRequest;
-import com.limitlesscode.aiwonfriendsbackend.dto.UserRegisterResponse;
+import com.limitlesscode.aiwonfriendsbackend.dto.UserInfoResponse;
 import com.limitlesscode.aiwonfriendsbackend.entity.User;
 import com.limitlesscode.aiwonfriendsbackend.service.UserService;
 import jakarta.validation.Valid;
@@ -11,7 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/user")
+@RequestMapping("/api/users")
 @AllArgsConstructor
 public class UserController {
 
@@ -21,13 +21,14 @@ public class UserController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE) //어떤 미디어 타입을 받을 것인지 명시
     public ResponseEntity<?> register(@Valid @ModelAttribute UserRegisterRequest request) {
         User user = userService.register(request);
-        return ResponseEntity.status(201).body(UserRegisterResponse.toResponse(user));
+        return ResponseEntity.status(201).body(UserInfoResponse.toResponse(user));
     }
 
     //유저조회
     @GetMapping("/{id}")
     public ResponseEntity<?> getUser(@PathVariable String id) {
-        return ResponseEntity.status(200).body("id : " + id );
+        User user = userService.getUser(id);
+        return ResponseEntity.status(200).body(UserInfoResponse.toResponse(user));
     }
 
     //정보수정
