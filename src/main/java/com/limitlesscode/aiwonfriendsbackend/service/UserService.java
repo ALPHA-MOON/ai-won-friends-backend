@@ -32,7 +32,8 @@ public class UserService {
             LocalDateTime.now(),
             LocalDateTime.now(),
             null,
-                null
+            null,
+            "USER"
 
 
         );

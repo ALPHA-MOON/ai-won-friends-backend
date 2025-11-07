@@ -3,6 +3,8 @@ package com.limitlesscode.aiwonfriendsbackend.config;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
@@ -51,5 +53,10 @@ public class SecurityConfig {
         encoders.put("argon2", Argon2PasswordEncoder.defaultsForSpringSecurity_v5_8()); // 필요시 설정
 
         return new DelegatingPasswordEncoder(defaultId, encoders);
+    }
+
+    @Bean
+    AuthenticationManager authenticationManager(AuthenticationConfiguration cfg) throws Exception {
+        return cfg.getAuthenticationManager();
     }
 }

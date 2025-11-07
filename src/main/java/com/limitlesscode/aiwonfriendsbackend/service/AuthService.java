@@ -1,26 +1,35 @@
 package com.limitlesscode.aiwonfriendsbackend.service;
 
+import com.limitlesscode.aiwonfriendsbackend.dto.LoginRequest;
 import com.limitlesscode.aiwonfriendsbackend.entity.EmailVerificationToken;
 import com.limitlesscode.aiwonfriendsbackend.repository.EmailVerificationTokenRepository;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthService {
 
     private final JavaMailSender mailSender;
     private final EmailVerificationTokenRepository tokenRepository;
+    private final AuthenticationManager authenticationManager;
 
     @Value("${app.mail.from}")
     private String from;
@@ -60,6 +69,7 @@ public class AuthService {
                 """.formatted(verifyLink, tokenTtlMinutes);
 
         //인증이메일 보내기
+        //TODO: 토큰 저장과 메일 발송 정합성 고려(트렌젝션 범위)
         try {
             MimeMessage message = mailSender.createMimeMessage();
             // 멀티파트 true, UTF-8
@@ -96,5 +106,38 @@ public class AuthService {
         RANDOM.nextBytes(buf);
         // URL-safe Base64 (패딩 제거)
         return Base64.encodeBase64URLSafeString(buf);
+    }
+
+    //일치하지 않으면 Exception을 던짐
+    //loadUserByUsername                    DB에 사용자가 있는가	UsernameNotFoundException
+    //UserDetails.isAccountNonLocked	    계정 잠금 여부	    LockedException
+    //UserDetails.isEnabled	                활성화 여부	        DisabledException
+    //UserDetails.isAccountNonExpired	    계정 기간 만료 여부	AccountExpiredException
+    //UserDetails.isCredentialsNonExpired	비밀번호 만료 여부	    CredentialsExpiredException
+    //PasswordEncoder.matches	            비밀번호 비교	        BadCredentialsException
+    public String validateUser(LoginRequest request) {
+        final String email = request.email();
+        try {
+            Authentication auth = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(request.email(), request.password())
+            );
+            return auth.getName();
+        } catch (BadCredentialsException e) {
+            // 가장 흔한 케이스는 별도 분리해서 INFO/NOTICE급으로
+            log.warn("[LOGIN:FAIL] BadCredentials user={}", email);
+            throw e;
+
+        } catch (AuthenticationException e) {
+            // 그 외 Disabled/Locked/CredentialsExpired 등
+            log.warn("[LOGIN:FAIL] type={} user={} msg={}",
+                    e.getClass().getSimpleName(), email, e.getMessage());
+            throw e;
+
+        } catch (Exception e) {
+            // 예외가 AuthenticationException이 아닐 때 — 시스템 오류
+            log.error("[LOGIN:ERROR] user={} msg={}", email, e.getMessage(), e);
+            throw e;
+        }
+
     }
 }

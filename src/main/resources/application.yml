@@ -27,5 +27,8 @@ spring:
 app:
   mail:
     from: "AI-Won-Friends <aiwonfirends@gmail.com>"
-    verify-base-url: "http://localhost:8080/api/auth/verify/token"  # 이메일 버튼이 향할 주소
+    verify-base-url: "http://localhost:8080/api/auth/verify/email-token"  # 이메일 버튼이 향할 주소
     token-ttl-minutes: 5
+logging:
+  level:
+    org.springframework.security: DEBUG

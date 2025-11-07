@@ -14,29 +14,31 @@ import java.util.UUID;
 @NoArgsConstructor
 public class User {
     @Id()
-    UUID user_id;
+    private UUID user_id;
 
     @Column(nullable = false)
-    String hashed_password;
+    private String hashed_password;
 
     @Column(unique = true, nullable = false)
-    String email;
+    private String email;
 
     @Column(nullable = false)
-    String name;
+    private String name;
 
     @Column()
-    String photo;
+    private String photo;
 
     @Column(nullable = false)
-    LocalDateTime created_at;
+    private LocalDateTime created_at;
 
     @Column(nullable = false)
-    LocalDateTime updated_at;
+    private LocalDateTime updated_at;
 
     @Column()
-    LocalDateTime deleted_at;
+    private LocalDateTime deleted_at;
 
     @Column()
-    LocalDateTime last_login;
+    private LocalDateTime last_login;
+
+    private String role = "USER";
 }
