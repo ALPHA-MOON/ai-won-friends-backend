@@ -32,3 +32,5 @@ app:
 logging:
   level:
     org.springframework.security: DEBUG
+openai:
+  key: ${OPENAI_KEY}
